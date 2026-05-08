@@ -34,6 +34,7 @@ function autoCommando(u) {
   });
   if (target) {
     u.behaviorState = 'engaging';
+    u.facing = vecToDir(target.px - u.px, target.py - u.py);
     u.ap -= 20;
     let dmg = u.atk + randInt(-4, 4);
     target.hp -= dmg;
@@ -61,6 +62,7 @@ function autoSentinel(u) {
     });
     if (closest) {
       u.behaviorState = 'countering';
+      u.facing = vecToDir(closest.px - u.px, closest.py - u.py);
       u.ap -= 15;
       const dmg = u.atk + randInt(-2,2);
       closest.hp -= dmg;

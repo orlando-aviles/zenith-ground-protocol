@@ -25,6 +25,10 @@ function makeUnit(def) {
     counterReady: false,
     justHit: false,
     behaviorState: 'standby', // standby | moving | engaging | guarding | countering | healing | down
+    // sprite
+    facing: 'down',
+    anim: 0,
+    animTimer: 0,
   };
 }
 
@@ -40,5 +44,8 @@ function makeEnemy(x, y, tier) {
     targetUnit: null,
     tier,
     anim: 0,
+    animTimer: 0,
+    facing: 'down',
+    behaviorState: 'standby',
   };
 }

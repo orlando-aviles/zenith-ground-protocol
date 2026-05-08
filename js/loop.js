@@ -29,6 +29,17 @@ function gameLoop(ts) {
   units.forEach(u=>moveUnitToward(u,dt));
   enemies.forEach(e=>moveUnitToward(e,dt));
 
+  // advance sprite animation frames
+  const ANIM_SPEEDS = { idle: 0.35, walk: 0.13, shoot: 0.11, die: 0.25 };
+  [...units, ...enemies].forEach(entity => {
+    const anim = behaviorToAnim(entity.behaviorState || 'standby');
+    entity.animTimer = (entity.animTimer || 0) + dt;
+    if (entity.animTimer >= ANIM_SPEEDS[anim]) {
+      entity.animTimer = 0;
+      entity.anim = ((entity.anim || 0) + 1) % 4;
+    }
+  });
+
   // unit auto-AI
   units.forEach(u=>unitAutoAI(u,dt));
 
@@ -76,6 +87,7 @@ function startGame() {
   mapNumber = 1;
   mapStats = { kills:0, damageTaken:0, startTime:0 };
   units = UNIT_DEFS.map(makeUnit);
+  warmSpriteCache();
   generateMap(mapNumber);
   setSelection([units[0]]);
   buildUnitCards();

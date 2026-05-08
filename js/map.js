@@ -253,5 +253,7 @@ function moveUnitToward(unit, dt) {
   } else {
     unit.px += (dx/dist)*spd*dt;
     unit.py += (dy/dist)*spd*dt;
+    // update facing from movement direction
+    unit.facing = vecToDir(dx, dy);
   }
 }

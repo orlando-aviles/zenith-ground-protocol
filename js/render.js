@@ -68,10 +68,9 @@ function drawUnit(u) {
   if (!u.alive) return;
   if (!isCurrentlyVisible(u.px,u.py) && !fogGrid[Math.round(u.py/TILE)]?.[Math.round(u.px/TILE)]) return;
 
-  const cx = u.px+TILE/2-camera.x;
-  const cy = u.py+TILE/2-camera.y;
-  const isVis = isCurrentlyVisible(u.px,u.py);
-  const col = isVis ? u.color : '#334455';
+  const cx = u.px + TILE/2 - camera.x;
+  const cy = u.py + TILE/2 - camera.y;
+  const isVis = isCurrentlyVisible(u.px, u.py);
 
   // selection ring
   if (selectedUnits.has(u)) {
@@ -100,12 +99,14 @@ function drawUnit(u) {
     }
   }
 
-  // person figure — slightly offset upward so feet sit on center
-  drawPerson(ctx, cx, cy + 4, col, 0.88);
+  // dim sprite in fog
+  if (!isVis) ctx.globalAlpha = 0.45;
+  drawSpriteEntity(u, roleToPalette(u.role), cx, cy);
+  ctx.globalAlpha = 1;
 
   // hp bar above
   const bw = TILE-4, bh = 3;
-  const bx = cx-bw/2;
+  const bx = cx - bw/2;
   const by = cy - TILE/2 - 6;
   ctx.fillStyle = '#111';
   ctx.fillRect(bx, by, bw, bh);
@@ -115,30 +116,17 @@ function drawUnit(u) {
 
 function drawEnemy(e) {
   if (!e.alive) return;
-  if (!isCurrentlyVisible(e.px,e.py)) return;
+  if (!isCurrentlyVisible(e.px, e.py)) return;
 
-  const cx = e.px+TILE/2-camera.x;
-  const cy = e.py+TILE/2-camera.y;
+  const cx = e.px + TILE/2 - camera.x;
+  const cy = e.py + TILE/2 - camera.y;
 
-  // hostile figure — arms raised
-  ctx.fillStyle = e.color;
-  // head
-  ctx.beginPath();
-  ctx.arc(cx, cy - 8, 4, 0, Math.PI*2);
-  ctx.fill();
-  // body
-  ctx.fillRect(cx-3, cy-4, 6, 8);
-  // legs
-  ctx.fillRect(cx-3, cy+4, 2.5, 6);
-  ctx.fillRect(cx+0.5, cy+4, 2.5, 6);
-  // arms raised (aggressive)
-  ctx.fillRect(cx-7, cy-6, 3, 2);
-  ctx.fillRect(cx+4, cy-6, 3, 2);
+  drawSpriteEntity(e, roleToPalette('ENEMY', e.tier), cx, cy);
 
   // hp bar
-  const bw=TILE-4, bh=3, bx=cx-bw/2, by=cy-TILE/2-6;
-  ctx.fillStyle='#111'; ctx.fillRect(bx,by,bw,bh);
-  ctx.fillStyle='#cc2200'; ctx.fillRect(bx,by,bw*(e.hp/e.maxHp),bh);
+  const bw = TILE-4, bh = 3, bx = cx-bw/2, by = cy-TILE/2-6;
+  ctx.fillStyle = '#111'; ctx.fillRect(bx, by, bw, bh);
+  ctx.fillStyle = '#cc2200'; ctx.fillRect(bx, by, bw*(e.hp/e.maxHp), bh);
 }
 
 function updateProjectiles(dt) {

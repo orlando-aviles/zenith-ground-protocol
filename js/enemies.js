@@ -27,6 +27,8 @@ function enemyThink(enemy, dt) {
 
   if (d < TILE * 1.6) {
     // attack — sentinel def reduces damage
+    enemy.behaviorState = 'engaging';
+    enemy.facing = vecToDir(target.px - enemy.px, target.py - enemy.py);
     let dmg = enemy.atk + randInt(-3,3) - target.def;
     dmg = Math.max(1, dmg);
 
@@ -58,6 +60,7 @@ function enemyThink(enemy, dt) {
       checkGameOver();
     }
   } else if (d < TILE * 12) {
+    enemy.behaviorState = 'moving';
     const path = bfs(
       Math.round(enemy.px/TILE), Math.round(enemy.py/TILE),
       Math.round(target.px/TILE), Math.round(target.py/TILE)
