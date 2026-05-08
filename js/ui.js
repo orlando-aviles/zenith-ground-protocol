@@ -331,11 +331,17 @@ function moveGroupTo(tx, ty) {
     }
   });
 }
-// ─── Canvas Input ─────────────────────────────────────────────────────────────
-function worldCoords(e) {
-  const rect = canvas.getBoundingClientRect();
-  return {
-    mx: (e.clientX - rect.left) / camera.zoom + camera.x,
-    my: (e.clientY - rect.top)  / camera.zoom + camera.y,
-  };
+// ─── Camera ───────────────────────────────────────────────────────────────────
+function centerCamera() {
+  if (!selected || !selected.alive) return;
+  camera.x = selected.px + TILE/2 - (gc_w / camera.zoom)/2;
+  camera.y = selected.py + TILE/2 - (gc_h / camera.zoom)/2;
+  clampCamera();
+}
+
+function clampCamera() {
+  const visW = gc_w / camera.zoom;
+  const visH = gc_h / camera.zoom;
+  camera.x = Math.max(0, Math.min(MAP_W*TILE - visW, camera.x));
+  camera.y = Math.max(0, Math.min(MAP_H*TILE - visH, camera.y));
 }

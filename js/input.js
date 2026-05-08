@@ -1,3 +1,12 @@
+// ─── Canvas Input ─────────────────────────────────────────────────────────────
+function worldCoords(e) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    mx: (e.clientX - rect.left) / camera.zoom + camera.x,
+    my: (e.clientY - rect.top)  / camera.zoom + camera.y,
+  };
+}
+
 window.addEventListener('load', ()=>{
   canvas = document.getElementById('gc');
   ctx = canvas.getContext('2d');
