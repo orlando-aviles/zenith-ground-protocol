@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>ZENITH — Ground Protocol</title>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div id="header">
+  <div class="logo">Z E N I T H</div>
+  <div class="status" id="statusText">GROUND PROTOCOL — ACTIVE</div>
+  <div class="time-display" id="timeDisplay">T+00:00</div>
+</div>
+
+<div id="main">
+  <div id="canvasWrap">
+    <canvas id="gc"></canvas>
+
+    <div id="overlay">
+      <h1>ZENITH</h1>
+      <div class="sub">GROUND PROTOCOL</div>
+      <div class="lore">
+        Foundation is the last nation standing.<br/>
+        The world heart is dying.<br/>
+        Your squad of three is all that remains<br/>
+        between order and collapse.
+      </div>
+      <button class="start-btn" onclick="startGame()">DEPLOY SQUAD</button>
+    </div>
+
+    <div id="extractConfirm">
+      <h3>EXTRACT SQUAD?</h3>
+      <p>Area not fully scouted.<br/>You can keep exploring.</p>
+      <div class="extract-btns">
+        <button class="extract-btn yes" onclick="doExtract()">EXTRACT</button>
+        <button class="extract-btn no"  onclick="cancelExtract()">STAY</button>
+      </div>
+    </div>
+
+    <div id="resultsScreen">
+      <h2>SECTOR CLEAR</h2>
+      <div class="results-sub" id="resultsMapLabel">MAP 1 — FOUNDATION PERIMETER</div>
+      <div class="results-table" id="resultsTable"></div>
+      <button class="results-continue" onclick="showRecruit()">DEBRIEF COMPLETE →</button>
+    </div>
+
+    <div id="recruitScreen">
+      <h2>RECRUITMENT</h2>
+      <div class="recruit-sub" id="recruitSquadSize">SQUAD: 3 / 9</div>
+      <div class="recruit-cards" id="recruitCards"></div>
+      <button class="recruit-skip" onclick="nextMap()">SKIP — ADVANCE WITHOUT RECRUITING</button>
+    </div>
+  </div>
+
+  <div id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Squad</div>
+      <div id="unitCards"></div>
+    </div>
+
+    <div id="minimapSection">
+      <div class="sidebar-label">Recon Map</div>
+      <canvas id="minimapCanvas" width="200" height="150"></canvas>
+      <div class="minimap-stats">
+        <span id="fogPct">0% uncovered</span>
+        <span id="enemyCount">6 hostiles</span>
+      </div>
+    </div>
+
+    <div id="log"></div>
+  </div>
+</div>
+
+<!-- Mobile panel — shown instead of sidebar on small/touch screens -->
+<div id="mobilePanel">
+  <div id="mobilePanelTop">
+    <div id="mobileLeft">
+      <!-- pip row + selected unit cards injected here by JS -->
+    </div>
+    <div id="mobileRight">
+      <div class="sidebar-label" style="font-size:9px;letter-spacing:1px;color:var(--dim);font-family:'Share Tech Mono',monospace;margin-bottom:3px">RECON</div>
+      <canvas id="minimapCanvasMob"></canvas>
+      <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);margin-top:3px">
+        <span id="fogPctMob">0%</span>
+        <span id="enemyCountMob">—</span>
+      </div>
+    </div>
+  </div>
+  <div id="mobileBottom">
+    <div class="hint-text" id="hintTextMob" style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px;flex:1">TAP UNIT · TAP MAP TO MOVE</div>
+    <div class="resource-pill" style="font-family:'Share Tech Mono',monospace;font-size:10px;display:flex;align-items:center;gap:4px">
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--ok)"></div>
+      <span id="res-foundation-mob">100</span>
+    </div>
+    <div class="resource-pill" style="font-family:'Share Tech Mono',monospace;font-size:10px;display:flex;align-items:center;gap:4px">
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--accent)"></div>
+      <span id="res-flux-mob">60</span>
+    </div>
+  </div>
+</div>
+
+<div id="bottombar">
+  <div class="hint-text" id="hintText">SELECT A UNIT — CLICK MAP TO MOVE</div>
+  <div style="flex:1"></div>
+  <div class="resource-pill">
+    <div class="dot" style="background:var(--ok)"></div>
+    <span id="res-foundation">Foundation: 100</span>
+  </div>
+  <div class="resource-pill">
+    <div class="dot" style="background:var(--accent)"></div>
+    <span id="res-flux">Flux: 60</span>
+  </div>
+</div>
+
+<script src="js/constants.js"></script>
+<script src="js/units.js"></script>
+<script src="js/map.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/combat.js"></script>
+<script src="js/enemies.js"></script>
+<script src="js/extraction.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/loop.js"></script>
+<script src="js/input.js"></script>
+</body>
+</html>

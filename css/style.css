@@ -1,0 +1,604 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
+
+  :root {
+    --bg: #070a0f;
+    --panel: #0d1219;
+    --border: #1a2535;
+    --accent: #00c8ff;
+    --danger: #ff3a3a;
+    --warn: #ffaa00;
+    --ok: #00ff88;
+    --dim: #2a3a4a;
+    --text: #b0c4d8;
+    --textbright: #e0eaf5;
+    --fog: rgba(7,10,15,0.92);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    touch-action: none;
+  }
+
+  /* Header */
+  #header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 14px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  #header .logo {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 4px;
+  }
+
+  #header .status {
+    font-size: 12px;
+    color: var(--warn);
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  #header .time-display {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--dim);
+  }
+
+  /* ── Desktop layout ── */
+  #main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  #canvasWrap {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  canvas { display: block; cursor: crosshair; }
+
+  #sidebar {
+    width: 220px;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .sidebar-section {
+    border-bottom: 1px solid var(--border);
+    padding: 8px;
+  }
+
+  /* Bottom bar — desktop */
+  #bottombar {
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  /* Mobile bottom panel — hidden on desktop */
+  #mobilePanel { display: none; }
+
+  /* ── Mobile layout ── */
+  @media (max-width: 700px), (pointer: coarse) {
+    #header .time-display { display: none; }
+
+    #main { flex-direction: column; }
+
+    #sidebar { display: none; } /* replaced by mobilePanel */
+
+    #bottombar { display: none; }
+
+    canvas { cursor: default; }
+
+    /* Mobile panel sits below canvas */
+    #mobilePanel {
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      height: 220px;
+      overflow: hidden;
+    }
+
+    /* Top strip: pips + minimap side by side */
+    #mobilePanelTop {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #mobileLeft {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #mobileRight {
+      width: 140px;
+      flex-shrink: 0;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-left: 1px solid var(--border);
+    }
+
+    /* Bottom strip: hint + resources */
+    #mobileBottom {
+      display: flex;
+      align-items: center;
+      padding: 4px 10px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    /* selected unit card inside mobile panel */
+    .mob-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--accent);
+      border-radius: 5px;
+      padding: 5px 7px;
+      font-size: 10px;
+    }
+
+    .mob-card-name {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--textbright);
+      margin-bottom: 3px;
+    }
+
+    #minimapCanvas { width: 100% !important; height: auto !important; }
+  }
+
+  .sidebar-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  /* Unit cards — shown only for selected units */
+  .unit-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 6px 7px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    position: relative;
+  }
+
+  .unit-card:hover { border-color: var(--accent); }
+  .unit-card.selected { border-color: var(--accent); background: rgba(0,200,255,0.06); }
+  .unit-card.dead { opacity: 0.35; filter: grayscale(1); pointer-events: none; }
+
+  .unit-name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3px;
+  }
+
+  .unit-name {
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--textbright);
+  }
+
+  .unit-role {
+    font-size: 9px;
+    font-family: 'Share Tech Mono', monospace;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: var(--dim);
+    color: var(--accent);
+  }
+
+  /* Compact roster row — unselected units */
+  .roster-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .roster-pip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    background: rgba(255,255,255,0.03);
+    transition: border-color 0.12s;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text);
+  }
+  .roster-pip:hover { border-color: var(--accent); }
+  .roster-pip.dead  { opacity: 0.3; pointer-events: none; }
+  .roster-pip .pip-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .bar-row { margin-bottom: 2px; }
+  .bar-label {
+    font-size: 9px;
+    color: var(--dim);
+    margin-bottom: 1px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .bar-bg {
+    height: 5px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  .hp-fill { background: var(--ok); }
+  .ap-fill { background: var(--accent); }
+
+  /* Behavior state badge */
+  .unit-state {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-top: 5px;
+    display: inline-block;
+    background: rgba(255,255,255,0.05);
+    color: var(--dim);
+    transition: color 0.2s, background 0.2s;
+  }
+  .unit-state.engaging  { color: var(--danger); background: rgba(255,58,58,0.1); }
+  .unit-state.guarding  { color: var(--accent);  background: rgba(0,200,255,0.1); }
+  .unit-state.countering{ color: #ff9900;        background: rgba(255,153,0,0.12); }
+  .unit-state.healing   { color: var(--ok);      background: rgba(0,255,136,0.1); }
+  .unit-state.moving    { color: #aaa;           background: rgba(255,255,255,0.05); }
+  .unit-state.standby   { color: var(--dim);     background: rgba(255,255,255,0.03); }
+  .unit-state.down      { color: #555;           background: transparent; }
+
+  /* Minimap */
+  #minimapSection {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  #minimapCanvas {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    image-rendering: pixelated;
+  }
+  .minimap-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+
+  /* Log */
+  #log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  #log::-webkit-scrollbar { width: 3px; }
+  #log::-webkit-scrollbar-thumb { background: var(--dim); }
+
+  .log-entry { color: var(--text); margin-bottom: 1px; }
+  .log-entry.danger { color: var(--danger); }
+  .log-entry.warn { color: var(--warn); }
+  .log-entry.ok { color: var(--ok); }
+  .log-entry.info { color: var(--accent); }
+
+  /* Bottom bar */
+  #bottombar {
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  .hint-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+
+  .resource-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+  }
+
+  .resource-pill .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+
+  /* Overlay */
+  #overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(7,10,15,0.93);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  #overlay h1 {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 28px;
+    color: var(--accent);
+    letter-spacing: 8px;
+    margin-bottom: 8px;
+  }
+
+  #overlay .sub {
+    font-size: 13px;
+    color: var(--dim);
+    letter-spacing: 3px;
+    margin-bottom: 32px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  #overlay .start-btn {
+    padding: 12px 36px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  #overlay .start-btn:hover {
+    background: rgba(0,200,255,0.12);
+    box-shadow: 0 0 20px rgba(0,200,255,0.2);
+  }
+
+  /* Extraction confirm */
+  #extractConfirm {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(7,10,15,0.97);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 24px 32px;
+    text-align: center;
+    z-index: 80;
+    display: none;
+    min-width: 260px;
+  }
+  #extractConfirm h3 {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--accent);
+    letter-spacing: 3px;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  #extractConfirm p {
+    font-size: 12px;
+    color: var(--dim);
+    margin-bottom: 18px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .extract-btns { display: flex; gap: 10px; justify-content: center; }
+  .extract-btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: 1px solid;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    background: transparent;
+  }
+  .extract-btn.yes { border-color: var(--accent); color: var(--accent); }
+  .extract-btn.yes:hover { background: rgba(0,200,255,0.12); }
+  .extract-btn.no  { border-color: var(--dim); color: var(--dim); }
+  .extract-btn.no:hover  { background: rgba(255,255,255,0.05); }
+
+  /* Results screen */
+  #resultsScreen {
+    position: absolute; inset: 0;
+    background: rgba(7,10,15,0.96);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 90;
+    gap: 8px;
+  }
+  #resultsScreen h2 {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--accent);
+    letter-spacing: 6px;
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .results-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+  .results-table {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    text-align: left;
+    margin-bottom: 24px;
+    line-height: 2;
+  }
+  .results-table span { color: var(--accent); float: right; margin-left: 40px; }
+  .results-continue {
+    padding: 10px 32px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    cursor: pointer;
+  }
+  .results-continue:hover { background: rgba(0,200,255,0.1); }
+
+  /* Recruit screen */
+  #recruitScreen {
+    position: absolute; inset: 0;
+    background: rgba(7,10,15,0.97);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 90;
+    gap: 12px;
+  }
+  #recruitScreen h2 {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--warn);
+    letter-spacing: 6px;
+    font-size: 18px;
+  }
+  .recruit-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .recruit-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .recruit-card {
+    width: 160px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    text-align: center;
+  }
+  .recruit-card:hover {
+    border-color: var(--accent);
+    background: rgba(0,200,255,0.07);
+  }
+  .recruit-card .r-name {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--textbright);
+    margin-bottom: 4px;
+  }
+  .recruit-card .r-role {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .recruit-card .r-bio {
+    font-size: 11px;
+    color: var(--dim);
+    line-height: 1.6;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .recruit-card .r-stats {
+    margin-top: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text);
+    text-align: left;
+    line-height: 1.9;
+  }
+  .recruit-skip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 2px;
+    margin-top: 4px;
+    text-decoration: underline;
+  }
+  .recruit-skip:hover { color: var(--text); }
