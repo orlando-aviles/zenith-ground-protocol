@@ -29,6 +29,8 @@ function makeUnit(def) {
     facing: 'down',
     anim: 0,
     animTimer: 0,
+    // party
+    partyId: null,
   };
 }
 

@@ -72,12 +72,22 @@ function drawUnit(u) {
   const cy = u.py + TILE/2 - camera.y;
   const isVis = isCurrentlyVisible(u.px, u.py);
 
-  // selection ring
+  // selection ring — party color if assigned, otherwise default cyan
   if (selectedUnits.has(u)) {
+    const ringColor = u.partyId !== null ? PARTY_COLORS[u.partyId] : '#00c8ff';
     ctx.beginPath();
     ctx.arc(cx, cy, TILE/2+3, 0, Math.PI*2);
-    ctx.strokeStyle = u === selected ? 'rgba(0,200,255,0.9)' : 'rgba(0,200,255,0.45)';
+    ctx.strokeStyle = u === selected ? ringColor + 'ee' : ringColor + '70';
     ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // party ring — always visible when assigned, even unselected
+  if (u.partyId !== null && !selectedUnits.has(u)) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, TILE/2+2, 0, Math.PI*2);
+    ctx.strokeStyle = PARTY_COLORS[u.partyId] + '55';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
   }
 

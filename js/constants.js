@@ -19,6 +19,11 @@ let mapStats = { kills:0, damageTaken:0, startTime:0 };
 let selectedUnits = new Set(); // multi-select
 let selected = null;           // kept for sidebar compat — first in selection
 
+// ─── Party System ─────────────────────────────────────────────────────────────
+const PARTY_COLORS = ['#00c8ff', '#ff6a00', '#cc44ff']; // cyan, orange, purple
+const PARTY_LABELS = ['A', 'B', 'C'];
+// partyId stored per-unit: 0, 1, 2, or null = unassigned
+
 // box-select drag state
 let boxDrag = { active: false, sx:0, sy:0, ex:0, ey:0 };
 let pendingCmd = null; // 'attack','heal','scout'

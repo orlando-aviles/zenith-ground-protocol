@@ -14,6 +14,21 @@ function getStateLabel(u) {
   return labels[s] || ['● STANDBY', 'standby'];
 }
 
+function cycleParty(u, i) {
+  // null → 0 → 1 → 2 → null
+  if (u.partyId === null) u.partyId = 0;
+  else if (u.partyId === 0) u.partyId = 1;
+  else if (u.partyId === 1) u.partyId = 2;
+  else u.partyId = null;
+  buildUnitCards();
+  updateUnitCards();
+}
+
+function getPartyRingColor(u) {
+  if (u.partyId !== null) return PARTY_COLORS[u.partyId];
+  return null;
+}
+
 function buildUnitCards() {
   const container = document.getElementById('unitCards');
   container.innerHTML = '';
@@ -26,7 +41,9 @@ function buildUnitCards() {
     const pip = document.createElement('div');
     pip.className = 'roster-pip' + (!u.alive?' dead':'');
     pip.id = `pip-${i}`;
-    pip.innerHTML = `<div class="pip-dot" style="background:${u.color}"></div>${u.name}`;
+    const dotColor = u.partyId !== null ? PARTY_COLORS[u.partyId] : u.color;
+    const dotLabel = u.partyId !== null ? PARTY_LABELS[u.partyId] : '';
+    pip.innerHTML = `<div class="pip-dot" style="background:${dotColor};color:#000;font-size:7px;display:flex;align-items:center;justify-content:center;font-weight:700">${dotLabel}</div>${u.name}`;
     pip.onclick = () => {
       if (!u.alive) return;
       setSelection([u]);
@@ -43,10 +60,13 @@ function buildUnitCards() {
     card.id = `ucard-${i}`;
     card.style.display = selectedUnits.has(u) ? 'block' : 'none';
     const [stateText, stateCls] = getStateLabel(u);
+    const partyColor = u.partyId !== null ? PARTY_COLORS[u.partyId] : '#333344';
+    const partyLabel = u.partyId !== null ? PARTY_LABELS[u.partyId] : '—';
     card.innerHTML = `
       <div class="unit-name-row">
         <span class="unit-name">${u.name}</span>
         <span class="unit-role" style="color:${u.color}">${u.label}</span>
+        <button class="party-badge" id="party-btn-${i}" style="background:${partyColor};border-color:${partyColor}" title="Click to assign party">${partyLabel}</button>
       </div>
       <div class="bar-row">
         <div class="bar-label"><span>HP</span><span id="hp-val-${i}">${u.hp}/${u.maxHp}</span></div>
@@ -58,8 +78,11 @@ function buildUnitCards() {
       </div>
       <span class="unit-state ${stateCls}" id="state-${i}">${stateText}</span>
     `;
+    card.querySelector(`#party-btn-${i}`).addEventListener('click', (e) => {
+      e.stopPropagation();
+      cycleParty(u, i);
+    });
     card.onclick = () => {
-      // clicking card deselects this unit if multiple selected
       if (!u.alive) return;
       setSelection([u]);
       centerCamera();
@@ -156,7 +179,7 @@ function drawMinimap() {
   // units — slightly larger dot
   units.forEach(u => {
     if (!u.alive) return;
-    mmCtx.fillStyle = u.color;
+    mmCtx.fillStyle = u.partyId !== null ? PARTY_COLORS[u.partyId] : u.color;
     const ux = Math.round(u.px/TILE)*MM_SCALE;
     const uy = Math.round(u.py/TILE)*MM_SCALE;
     mmCtx.fillRect(ux-1, uy-1, MM_SCALE+1, MM_SCALE+1);
